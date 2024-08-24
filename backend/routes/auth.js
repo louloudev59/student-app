@@ -6,7 +6,6 @@ const router = express.Router();
 
 router.post('/register', async (req, res) => {
     const { name, email, password } = req.body;
-
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) return res.status(400).json({ message: 'L\'utilisateur existe déjà' });
@@ -18,16 +17,15 @@ router.post('/register', async (req, res) => {
         const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
         res.json({ token, user: { id: newUser._id, name: newUser.name, email: newUser.email } });
     } catch (err) {
-        res.status(500).json({ message: 'Erreur du serveur' });
+        res.status(500).json({ message: 'Serveur erreur' });
     }
 });
 
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
-
     try {
         const user = await User.findOne({ email });
-        if (!user) return res.status(400).json({ message: 'L\'utilisateur n\'existe pas	' });
+        if (!user) return res.status(400).json({ message: 'L\'utilisateur n\'existe pas' });
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ message: 'Informations invalides' });
